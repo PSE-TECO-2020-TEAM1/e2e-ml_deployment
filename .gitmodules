@@ -1,0 +1,12 @@
+[submodule "client"]
+	path = client
+	url = git@github.com:PSE-TECO-2020-TEAM1/client.git
+[submodule "Authentication"]
+	path = Authentication
+	url = git@github.com:PSE-TECO-2020-TEAM1/Authentication.git
+[submodule "Model-Management"]
+	path = Model-Management
+	url = git@github.com:PSE-TECO-2020-TEAM1/Model-Management.git
+[submodule "Workspace-Management"]
+	path = Workspace-Management
+	url = git@github.com:PSE-TECO-2020-TEAM1/Workspace-Management.git
