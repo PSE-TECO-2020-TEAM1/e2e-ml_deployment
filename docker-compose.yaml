@@ -1,6 +1,9 @@
 ---
 version: '3'
 services:
+  # currently we don't use named volumes or mapped volumes to ease adoption
+  # one may want to change this in production, left as an exercise for the 
+  # sysadmin
   workspace-db:
     image: mongo
     container_name: workspace-db
