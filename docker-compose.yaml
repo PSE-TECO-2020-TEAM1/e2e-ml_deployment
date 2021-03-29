@@ -1,60 +1,72 @@
 ---
 version: '3'
 services:
-  # currently we don't use named volumes or mapped volumes to ease adoption
-  # one may want to change this in production, left as an exercise for the 
-  # sysadmin
   workspace-db:
     image: mongo
     container_name: workspace-db
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=keklolxd
-      - MONGO_INITDB_ROOT_PASSWORD=lolkekxd
-  workspace:
-    build: ./Workspace-Management
-    container_name: workspace
-    environment:
-      - PORT=80
-      - DATABASE=workspace_management
-      - DATABASE_IP=workspace-db
-      - DATABASE_USER=keklolxd
-      - DATABASE_PASS=lolkekxd
-      - MODEL_MANAGEMENT_HOST=model
-      - MODEL_MANAGEMENT_PORT=80
-      - ACCESS_TOKEN_SECRET=${AUTHENTICATION_SECRET}
-
+      - MONGO_INITDB_ROOT_USERNAME=${WORKSPACE_DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${WORKSPACE_DB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${WORKSPACE_DB_NAME}
   model-db:
     image: mongo
     container_name: model-db
     restart: always
-  model:
-    build: ./Model-Management
-    container_name: model
     environment:
-      - PORT=80 
-      - DATABASE_NAME=model_management
-      - DATABASE_URI=mongodb://model-db/
-      - WORKSPACE_MANAGEMENT_IP_PORT=http://workspace
-      - AUTH_SECRET=${AUTHENTICATION_SECRET}
-
+      - MONGO_INITDB_DATABASE=${MODEL_DB_NAME}
   auth-db:
     image: mongo
     container_name: auth-db
     restart: always
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=kekauthxd
-      - MONGO_INITDB_ROOT_PASSWORD=authkekxd
+      - MONGO_INITDB_ROOT_USERNAME=${AUTH_DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${AUTH_DB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${AUTH_DB_NAME}
+
+  workspace:
+    build: ./Workspace-Management
+    container_name: workspace
+    network_mode: host
+    environment:
+      - PORT=11140
+
+      - DATABASE_IP=workspace-db
+      - DATABASE_PORT=27017
+      - DATABASE=${WORKSPACE_DB_NAME}
+      - DATABASE_USER=${WORKSPACE_DB_USERNAME}
+      - DATABASE_PASS=${WORKSPACE_DB_PASSWORD}
+
+      - MODEL_MANAGEMENT_HOST=localhost
+      - MODEL_MANAGEMENT_PORT=11150
+      - ACCESS_TOKEN_SECRET=${AUTHENTICATION_SECRET}
+
+  model:
+    build: ./Model-Management
+    container_name: model
+    network_mode: host
+    environment:
+      - PORT=11150
+
+      - DATABASE_NAME=${MODEL_DB_NAME}
+      - DATABASE_PORT=27017
+      - DATABASE_URI=mongodb://model-db/
+
+      - WORKSPACE_MANAGEMENT_IP_PORT=http://localhost:11140
+      - AUTH_SECRET=${AUTHENTICATION_SECRET}
+
   auth:
     build: ./Authentication
     container_name: auth
+    network_mode: host
     environment:
-      - PORT=80
+      - PORT=11160
 
+      - DATABASE=${AUTH_DB_NAME}
       - DATABASE_IP=auth-db
-      - DATABASE_USER=kekauthxd
-      - DATABASE_PASS=authkekxd
-      - DATABASE=authentication
+      - DATABASE_USER=${AUTH_DB_USERNAME}
+      - DATABASE_PASS=${AUTH_DB_PASSWORD}
+      - DATABASE_PORT=27017
 
       - ACCESS_TOKEN_SECRET=${AUTHENTICATION_SECRET}
 
@@ -66,19 +78,7 @@ services:
   client:
     build: ./client
     container_name: client
-    environment:
-      - REACT_APP_BASE_URL=${BASE_URL}
-    # ports:
-    #   - 8080:80
-
-  proxy:
-    image: nginx
-    container_name: proxy
-    volumes:
-    - ./nginx.conf:/etc/nginx/nginx.conf
-    - ./nginx-selfsigned.crt:/etc/ssl/certs/nginx-selfsigned.crt
-    - ./nginx-selfsigned.key:/etc/ssl/private/nginx-selfsigned.key
-    - ./snippets:/etc/nginx/snippets
-    - ./dhparam.pem:/etc/ssl/certs/dhparam.pem
-    ports:
-    - 8443:443
+    network_mode: host
+    # environment:
+    #   - PORT=80
+    #   - BASE_URL=https://edge-ml.dmz.teco.edu/
