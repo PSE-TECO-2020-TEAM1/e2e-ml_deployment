@@ -1,4 +1,4 @@
-# glue - example deployment of the application
+# deployment - example deployment of the application
 
 This repository serves as an example deployment of "An Interactive End-To-End Machine Learning Platform" (Name subject to change). The application consists of 4 different components, each of which is distributed as a docker image via Dockerfiles.
 
