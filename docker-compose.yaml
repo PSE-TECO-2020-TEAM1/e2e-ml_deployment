@@ -1,10 +1,16 @@
 ---
 version: '3'
+volumes:
+  workspace_vol:
+  auth_vol:
+  model_vol:
 services:
   workspace-db:
     image: mongo
     container_name: workspace-db
     restart: always
+    volumes:
+      - workspace_vol:/data/db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${WORKSPACE_DB_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${WORKSPACE_DB_PASSWORD}
@@ -13,12 +19,16 @@ services:
     image: mongo
     container_name: model-db
     restart: always
+    volumes:
+      - model_vol:/data/db
     environment:
       - MONGO_INITDB_DATABASE=${MODEL_DB_NAME}
   auth-db:
     image: mongo
     container_name: auth-db
     restart: always
+    volumes:
+      - auth_vol:/data/db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${AUTH_DB_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${AUTH_DB_PASSWORD}
