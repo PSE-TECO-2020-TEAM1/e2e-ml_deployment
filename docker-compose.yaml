@@ -15,6 +15,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${WORKSPACE_DB_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${WORKSPACE_DB_PASSWORD}
       - MONGO_INITDB_DATABASE=${WORKSPACE_DB_NAME}
+    ports:
+      - 27517:27017
   model-db:
     image: mongo
     container_name: model-db
@@ -23,6 +25,8 @@ services:
       - model_vol:/data/db
     environment:
       - MONGO_INITDB_DATABASE=${MODEL_DB_NAME}
+    ports:
+      - 27518:27017
   auth-db:
     image: mongo
     container_name: auth-db
@@ -33,6 +37,8 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=${AUTH_DB_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${AUTH_DB_PASSWORD}
       - MONGO_INITDB_DATABASE=${AUTH_DB_NAME}
+    ports:
+      - 27519:27017
 
   workspace:
     build: ./Workspace-Management
@@ -41,13 +47,13 @@ services:
     environment:
       - PORT=11140
 
-      - DATABASE_IP=workspace-db
-      - DATABASE_PORT=27017
+      - DATABASE_IP=127.0.0.1
+      - DATABASE_PORT=27517
       - DATABASE=${WORKSPACE_DB_NAME}
       - DATABASE_USER=${WORKSPACE_DB_USERNAME}
       - DATABASE_PASS=${WORKSPACE_DB_PASSWORD}
 
-      - MODEL_MANAGEMENT_HOST=localhost
+      - MODEL_MANAGEMENT_HOST=127.0.0.1
       - MODEL_MANAGEMENT_PORT=11150
       - ACCESS_TOKEN_SECRET=${AUTHENTICATION_SECRET}
 
@@ -60,9 +66,9 @@ services:
 
       - DATABASE_NAME=${MODEL_DB_NAME}
       - DATABASE_PORT=27017
-      - DATABASE_URI=mongodb://model-db/
+      - DATABASE_URI=mongodb://127.0.0.1:27518/
 
-      - WORKSPACE_MANAGEMENT_IP_PORT=http://localhost:11140
+      - WORKSPACE_MANAGEMENT_IP_PORT=http://127.0.0.1:11140
       - AUTH_SECRET=${AUTHENTICATION_SECRET}
 
   auth:
@@ -73,10 +79,10 @@ services:
       - PORT=11160
 
       - DATABASE=${AUTH_DB_NAME}
-      - DATABASE_IP=auth-db
+      - DATABASE_IP=127.0.0.1
       - DATABASE_USER=${AUTH_DB_USERNAME}
       - DATABASE_PASS=${AUTH_DB_PASSWORD}
-      - DATABASE_PORT=27017
+      - DATABASE_PORT=27519
 
       - ACCESS_TOKEN_SECRET=${AUTHENTICATION_SECRET}
 
@@ -89,6 +95,6 @@ services:
     build: ./client
     container_name: client
     network_mode: host
-    # environment:
-    #   - PORT=80
+    environment:
+      - PORT=11170
     #   - BASE_URL=https://edge-ml.dmz.teco.edu/
