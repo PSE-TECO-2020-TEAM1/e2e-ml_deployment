@@ -23,8 +23,6 @@ services:
     restart: always
     volumes:
       - model_vol:/data/db
-    environment:
-      - MONGO_INITDB_DATABASE=${MODEL_DB_NAME}
     ports:
       - 27518:27017
   auth-db:
@@ -33,10 +31,6 @@ services:
     restart: always
     volumes:
       - auth_vol:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${AUTH_DB_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${AUTH_DB_PASSWORD}
-      - MONGO_INITDB_DATABASE=${AUTH_DB_NAME}
     ports:
       - 27519:27017
 
@@ -62,7 +56,8 @@ services:
     container_name: model
     network_mode: host
     environment:
-      - PORT=11150
+      - LISTEN_IP=0.0.0.0
+      - LISTEN_PORT=11150
 
       - DATABASE_NAME=${MODEL_DB_NAME}
       - DATABASE_PORT=27017
