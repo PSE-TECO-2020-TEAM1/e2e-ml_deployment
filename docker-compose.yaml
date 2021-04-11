@@ -31,6 +31,10 @@ services:
     restart: always
     volumes:
       - auth_vol:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${AUTH_DB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${AUTH_DB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${AUTH_DB_NAME}
     ports:
       - 27519:27017
 
@@ -73,8 +77,11 @@ services:
     environment:
       - PORT=11160
 
+      - DATABASE=${AUTH_DB_NAME}
       - DATABASE_IP=127.0.0.1
       - DATABASE_PORT=27519
+      - DATABASE_USER=${AUTH_DB_USERNAME}
+      - DATABASE_PASS=${AUTH_DB_PASSWORD}
 
       - ACCESS_TOKEN_SECRET=${AUTHENTICATION_SECRET}
 
